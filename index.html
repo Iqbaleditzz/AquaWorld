@@ -3,231 +3,189 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AquaWorld Pro</title>
+<title>AquaWorld | iqbaleditzz</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
-body{
-background:#020c1b;
-color:#fff;
-overflow-x:hidden;
-}
-
-/* WATER ANIMATION BACKGROUND */
-body::before{
-content:"";
-position:fixed;
-width:200%;
-height:200%;
-background:radial-gradient(circle at 30% 30%,rgba(0,255,200,0.1),transparent 40%),
-            radial-gradient(circle at 70% 60%,rgba(0,100,255,0.15),transparent 40%);
-animation:water 10s infinite linear;
-z-index:-2;
-}
-@keyframes water{
-0%{transform:translate(0,0)}
-50%{transform:translate(-5%, -5%)}
-100%{transform:translate(0,0)}
-}
-
-/* 3D canvas */
-#bg3d{position:fixed;top:0;left:0;z-index:-1}
-
-/* Navbar */
-nav{
-display:flex;
-justify-content:space-between;
-padding:15px 20px;
-background:rgba(2,12,27,0.8);
-backdrop-filter:blur(10px);
-position:sticky;top:0;
-}
-nav h2{color:#64ffda}
-
-/* Hero */
-.hero{text-align:center;padding:60px 20px}
-.hero h1{font-size:2.5rem;color:#64ffda}
-
-/* Controls */
-.controls{text-align:center}
-input,select{
-padding:10px;
-margin:5px;
-border:none;
-border-radius:20px;
-width:80%;
-max-width:300px;
-}
-
-/* Grid */
+body{margin:0;font-family:Poppins;background:#020c1b;color:#fff;overflow:hidden}
+#ui{position:absolute;top:10px;width:100%;text-align:center;z-index:10}
+input,select,button{padding:8px;margin:5px;border-radius:10px;border:none}
 .grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-padding:20px;
+position:absolute;bottom:0;width:100%;
+display:flex;overflow-x:auto;padding:10px;gap:10px
 }
-
-/* Card */
 .card{
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(10px);
-border-radius:15px;
-overflow:hidden;
-transition:0.3s;
-cursor:pointer;
+min-width:200px;background:#112240;border-radius:10px;overflow:hidden
 }
-.card:hover{
-transform:scale(1.05);
-box-shadow:0 0 20px rgba(0,255,200,0.3);
-}
-.card img{
-width:100%;
-height:200px;
-object-fit:cover;
-}
-.card-content{padding:15px}
-.card-content h3{color:#64ffda}
-.details{display:none;font-size:.9rem;margin-top:10px}
-
-/* WhatsApp */
+.card img{width:100%;height:120px;object-fit:cover}
 .whatsapp{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#25d366;
-padding:15px;
-border-radius:50%;
+position:fixed;bottom:20px;right:20px;background:#25d366;padding:15px;border-radius:50%
+}
+#brand{
+position:fixed;top:10px;right:15px;
+opacity:.3;font-size:12px
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="bg3d"></canvas>
+<div id="brand">iqbaleditzz</div>
 
-<nav><h2>AquaWorld</h2></nav>
-
-<section class="hero">
-<h1>Living Art Aquarium</h1>
-<p>Not decoration. Movement.</p>
-</section>
-
-<div class="controls">
-<input id="search" placeholder="Search fish...">
+<div id="ui">
+<input id="search" placeholder="Search fish">
 <select id="sort">
 <option value="default">Sort</option>
-<option value="low">Low → High</option>
-<option value="high">High → Low</option>
-<option value="name">A → Z</option>
+<option value="low">Price Low</option>
+<option value="high">Price High</option>
+<option value="name">Name</option>
 </select>
+<button onclick="resetFilters()">Reset</button>
 </div>
 
-<section class="grid">
+<div class="grid" id="grid"></div>
 
-<div class="card betta" data-name="Blue Betta" data-price="300" onclick="toggleDetails(this)">
-<img src="https://images.unsplash.com/photo-1518717758536-85ae29035b6d">
-<div class="card-content">
-<h3>Blue Betta</h3>
-<p>₹300</p>
-<div class="details">Deep blue, flowing fins. Dominates any tank.</div>
-</div>
-</div>
-
-<div class="card betta" data-name="Red Betta" data-price="280" onclick="toggleDetails(this)">
-<img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5">
-<div class="card-content">
-<h3>Red Betta</h3>
-<p>₹280</p>
-<div class="details">Aggressive beauty. Pure attention magnet.</div>
-</div>
-</div>
-
-<div class="card betta" data-name="Halfmoon Betta" data-price="450" onclick="toggleDetails(this)">
-<img src="https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0">
-<div class="card-content">
-<h3>Halfmoon Betta</h3>
-<p>₹450</p>
-<div class="details">Full 180° tail spread. Premium grade.</div>
-</div>
-</div>
-
-</section>
-
-<a href="#" class="whatsapp">💬</a>
+<a href="#" class="whatsapp">
+<svg viewBox="0 0 32 32" width="24" height="24" fill="#fff">
+<path d="M16 .4C7.2.4.1 7.5.1 16.3c0 2.9.8 5.7 2.3 8.2L0 32l7.7-2.3c2.4 1.3 5.1 2 8 2 8.8 0 15.9-7.1 15.9-15.9C31.6 7.5 24.5.4 16 .4zm0 29c-2.5 0-4.9-.7-7-2l-.5-.3-4.6 1.4 1.4-4.5-.3-.5c-1.4-2.2-2.2-4.7-2.2-7.3 0-7.6 6.2-13.8 13.8-13.8S29.8 8.6 29.8 16.2 23.6 29.4 16 29.4zm7.5-10.3c-.4-.2-2.3-1.1-2.7-1.2-.4-.1-.6-.2-.9.2s-1 1.2-1.2 1.5-.4.3-.8.1c-.4-.2-1.7-.6-3.3-2-1.2-1-2-2.2-2.3-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.6-.6.2-.2.3-.4.4-.6.1-.2 0-.5 0-.7 0-.2-.9-2.1-1.2-2.9-.3-.7-.6-.6-.9-.6h-.8c-.3 0-.7.1-1 .5-.4.4-1.4 1.3-1.4 3.2s1.5 3.8 1.7 4.1c.2.3 3 4.6 7.4 6.3 1 .4 1.8.7 2.4.9 1 .3 1.9.2 2.6.1.8-.1 2.3-.9 2.6-1.8.3-.9.3-1.6.2-1.8-.1-.2-.4-.3-.8-.5z"/>
+</svg>
+</a>
 
 <script>
-/* 3D Fish */
+/* THREE SETUP */
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);
-const renderer=new THREE.WebGLRenderer({canvas:bg3d,alpha:true});
+const renderer=new THREE.WebGLRenderer();
 renderer.setSize(innerWidth,innerHeight);
+document.body.appendChild(renderer.domElement);
+camera.position.z=10;
 
-const light=new THREE.PointLight(0xffffff,1);
-light.position.set(5,5,5);
-scene.add(light);
+/* WATER SHADER */
+const waterGeo=new THREE.PlaneGeometry(30,30,128,128);
+const waterMat=new THREE.ShaderMaterial({
+uniforms:{time:{value:0}},
+vertexShader:`
+varying vec2 vUv;
+uniform float time;
+void main(){
+vUv=uv;
+vec3 pos=position;
+pos.z += sin(pos.x*2.0 + time)*0.2;
+pos.z += cos(pos.y*2.0 + time)*0.2;
+gl_Position=projectionMatrix*modelViewMatrix*vec4(pos,1.0);
+}`,
+fragmentShader:`
+varying vec2 vUv;
+void main(){
+gl_FragColor=vec4(0.0,0.2,0.4,0.8);
+}`
+});
+const water=new THREE.Mesh(waterGeo,waterMat);
+water.rotation.x=-Math.PI/2;
+scene.add(water);
 
-// fish body
-const body=new THREE.Mesh(
- new THREE.SphereGeometry(0.5,32,32),
- new THREE.MeshStandardMaterial({color:0xff4d6d})
+/* FISH (BOIDS) */
+let fishes=[];
+function createFish(){
+let mesh=new THREE.Mesh(
+new THREE.SphereGeometry(0.2),
+new THREE.MeshBasicMaterial({color:Math.random()*0xffffff})
 );
-scene.add(body);
+mesh.position.set(Math.random()*5,Math.random()*3,0);
+mesh.userData.velocity=new THREE.Vector3();
+scene.add(mesh);
+fishes.push(mesh);
+}
+for(let i=0;i<20;i++)createFish();
 
-// tail (fake animation)
-const tail=new THREE.Mesh(
- new THREE.ConeGeometry(0.3,1,32),
- new THREE.MeshStandardMaterial({color:0xff4d6d})
+/* FOOD */
+let food=null;
+document.addEventListener("click",(e)=>{
+food=new THREE.Vector3(
+(e.clientX/innerWidth-0.5)*10,
+-(e.clientY/innerHeight-0.5)*6,
+0
 );
-tail.position.x=-0.8;
-tail.rotation.z=Math.PI/2;
-body.add(tail);
-
-camera.position.z=5;
-
-let mouseX=0,mouseY=0;
-document.addEventListener("mousemove",(e)=>{
-mouseX=(e.clientX/innerWidth)*2-1;
-mouseY=-(e.clientY/innerHeight)*2+1;
 });
 
+/* BOIDS */
+function updateBoids(){
+fishes.forEach(f=>{
+let sep=new THREE.Vector3(),ali=new THREE.Vector3(),coh=new THREE.Vector3();
+fishes.forEach(o=>{
+let d=f.position.distanceTo(o.position);
+if(d>0 && d<1) sep.add(f.position.clone().sub(o.position));
+ali.add(o.userData.velocity);
+coh.add(o.position);
+});
+ali.divideScalar(fishes.length);
+coh.divideScalar(fishes.length).sub(f.position);
+
+if(food) coh.add(food.clone().sub(f.position).multiplyScalar(0.5));
+
+f.userData.velocity.add(sep.multiplyScalar(0.01));
+f.userData.velocity.add(ali.multiplyScalar(0.005));
+f.userData.velocity.add(coh.multiplyScalar(0.005));
+
+f.userData.velocity.clampLength(0,0.05);
+f.position.add(f.userData.velocity);
+});
+}
+
+/* ANIMATE */
 function animate(){
 requestAnimationFrame(animate);
-
-// follow
-body.position.x+=(mouseX*2-body.position.x)*0.05;
-body.position.y+=(mouseY*2-body.position.y)*0.05;
-
-// tail wave
-tail.rotation.y=Math.sin(Date.now()*0.01)*0.5;
-
+waterMat.uniforms.time.value+=0.03;
+updateBoids();
 renderer.render(scene,camera);
 }
 animate();
 
+/* UI DATA */
+const fishData=[
+{name:"Betta Blue",price:300,img:"https://images.unsplash.com/photo-1518717758536-85ae29035b6d"},
+{name:"Goldfish",price:150,img:"https://images.unsplash.com/photo-1571752726703-5e7d1f6a1b0c"},
+{name:"Guppy",price:80,img:"https://images.unsplash.com/photo-1560807707-8cc77767d783"},
+{name:"Angelfish",price:200,img:"https://images.unsplash.com/photo-1544551763-46a013bb70d5"}
+];
+
+const grid=document.getElementById("grid");
+
+function render(data){
+grid.innerHTML="";
+data.forEach(f=>{
+grid.innerHTML+=`
+<div class="card">
+<img src="${f.img}">
+<div style="padding:10px">
+<h4>${f.name}</h4>
+<p>₹${f.price}</p>
+</div></div>`;
+});
+}
+render(fishData);
+
 /* SEARCH */
 search.oninput=()=>{
-let v=search.value.toLowerCase();
-document.querySelectorAll(".card").forEach(c=>{
-c.style.display=c.dataset.name.toLowerCase().includes(v)?"block":"none";
-});
+render(fishData.filter(f=>f.name.toLowerCase().includes(search.value.toLowerCase())));
 };
 
 /* SORT */
 sort.onchange=()=>{
-let cards=[...document.querySelectorAll(".card")];
-if(sort.value=="low")cards.sort((a,b)=>a.dataset.price-b.dataset.price);
-if(sort.value=="high")cards.sort((a,b)=>b.dataset.price-a.dataset.price);
-if(sort.value=="name")cards.sort((a,b)=>a.dataset.name.localeCompare(b.dataset.name));
-cards.forEach(c=>document.querySelector(".grid").appendChild(c));
+let d=[...fishData];
+if(sort.value=="low")d.sort((a,b)=>a.price-b.price);
+if(sort.value=="high")d.sort((a,b)=>b.price-a.price);
+if(sort.value=="name")d.sort((a,b)=>a.name.localeCompare(b.name));
+render(d);
 };
 
-/* DETAILS */
-function toggleDetails(c){
-let d=c.querySelector(".details");
-d.style.display=d.style.display=="block"?"none":"block";
+/* RESET */
+function resetFilters(){
+search.value="";
+sort.value="default";
+render(fishData);
 }
 </script>
 
