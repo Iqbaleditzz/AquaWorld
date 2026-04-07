@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AquaWorld - Indoor Fish Sale</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+body{background:#0a192f;color:#fff;overflow-x:hidden}
+
+/* 3D canvas */
+#bg3d{position:fixed;top:0;left:0;z-index:-1}
+
+/* Navbar */
+nav{display:flex;justify-content:space-between;padding:15px 20px;background:#020c1b;position:sticky;top:0;z-index:100}
+nav h2{color:#64ffda}
+nav a{color:#fff;text-decoration:none;margin-left:15px}
+
+/* Hero */
+.hero{text-align:center;padding:60px 20px}
+.hero h1{font-size:2.5rem;color:#64ffda}
+.hero p{opacity:.8}
+
+/* Search + Sort */
+.controls{text-align:center;padding:10px}
+.controls input,.controls select{
+padding:10px;border:none;border-radius:20px;margin:5px;width:80%;max-width:300px}
+
+/* Filters */
+.filters{display:flex;justify-content:center;gap:10px;padding:10px;flex-wrap:wrap}
+.filters button{padding:8px 15px;border:none;background:#112240;color:#fff;cursor:pointer;border-radius:20px}
+.filters button.active{background:#64ffda;color:#000}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;padding:20px}
+
+/* Card */
+.card{background:#112240;border-radius:10px;overflow:hidden;cursor:pointer;transition:.3s}
+.card:hover{transform:translateY(-5px)}
+.card img{width:100%;height:180px;object-fit:cover}
+.card-content{padding:15px}
+.card-content h3{color:#64ffda}
+
+/* Details */
+.details{display:none;padding-top:10px;font-size:.9rem;opacity:.8}
+
+/* Contact */
+.contact{padding:30px;text-align:center;background:#020c1b}
+
+/* WhatsApp */
+.whatsapp{position:fixed;bottom:20px;right:20px;background:#25d366;padding:15px;border-radius:50%;color:#fff;text-decoration:none;font-size:20px}
+</style>
+</head>
+
+<body>
+
+<canvas id="bg3d"></canvas>
+
+<nav>
+  <h2>AquaWorld</h2>
+  <div>
+    <a href="#">Home</a>
+    <a href="#">Fish</a>
+    <a href="#">Contact</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>Premium Indoor Fish Collection</h1>
+  <p>Silent beauty. Moving water. Living art.</p>
+</section>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="Search fish...">
+  <select id="sort">
+    <option value="default">Sort</option>
+    <option value="low">Price Low → High</option>
+    <option value="high">Price High → Low</option>
+    <option value="name">Name A → Z</option>
+  </select>
+</div>
+
+<div class="filters">
+  <button class="active" onclick="filterItems('all',this)">All</button>
+  <button onclick="filterItems('goldfish',this)">Goldfish</button>
+  <button onclick="filterItems('betta',this)">Betta</button>
+  <button onclick="filterItems('aquarium',this)">Aquarium</button>
+  <button onclick="filterItems('accessories',this)">Accessories</button>
+</div>
+
+<section class="grid">
+
+<div class="card betta" data-name="Betta Fish" data-price="250" onclick="toggleDetails(this)">
+<img src="https://images.unsplash.com/photo-1618826411640-d6df44dd3f7a">
+<div class="card-content">
+<h3>Betta Fish</h3>
+<p>₹250</p>
+<div class="details">Aggressive beauty. Needs its own space.</div>
+</div>
+</div>
+
+<div class="card goldfish" data-name="Goldfish" data-price="150" onclick="toggleDetails(this)">
+<img src="https://images.unsplash.com/photo-1571752726703-5e7d1f6a1b0c">
+<div class="card-content">
+<h3>Goldfish</h3>
+<p>₹150</p>
+<div class="details">Beginner-friendly. Low maintenance.</div>
+</div>
+</div>
+
+<div class="card aquarium" data-name="Glass Aquarium" data-price="1200" onclick="toggleDetails(this)">
+<img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee">
+<div class="card-content">
+<h3>Aquarium</h3>
+<p>₹1200</p>
+<div class="details">Clean glass. Clear world.</div>
+</div>
+</div>
+
+<div class="card accessories" data-name="Fish Food" data-price="100" onclick="toggleDetails(this)">
+<img src="https://images.unsplash.com/photo-1563213126-a4273aed2016">
+<div class="card-content">
+<h3>Fish Food</h3>
+<p>₹100</p>
+<div class="details">Nutrition decides survival.</div>
+</div>
+</div>
+
+</section>
+
+<section class="contact">
+<h2>Contact</h2>
+<p>WhatsApp: +91 99999 99999</p>
+</section>
+
+<a href="https://wa.me/919999999999" class="whatsapp">💬</a>
+
+<script>
+/* 3D Fish */
+const canvas=document.getElementById("bg3d");
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+const renderer=new THREE.WebGLRenderer({canvas,alpha:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+
+const light=new THREE.PointLight(0xffffff,1);
+light.position.set(5,5,5);
+scene.add(light);
+
+// Fish (stylized)
+const body=new THREE.Mesh(
+  new THREE.SphereGeometry(0.5,32,32),
+  new THREE.MeshStandardMaterial({color:0xff4d6d})
+);
+scene.add(body);
+
+camera.position.z=5;
+
+let mouseX=0,mouseY=0;
+document.addEventListener("mousemove",(e)=>{
+mouseX=(e.clientX/window.innerWidth)*2-1;
+mouseY=-(e.clientY/window.innerHeight)*2+1;
+});
+
+function animate(){
+requestAnimationFrame(animate);
+body.position.x+=(mouseX*2-body.position.x)*0.05;
+body.position.y+=(mouseY*2-body.position.y)*0.05;
+body.rotation.y+=0.02;
+renderer.render(scene,camera);
+}
+animate();
+
+/* Resize */
+window.addEventListener("resize",()=>{
+renderer.setSize(window.innerWidth,window.innerHeight);
+camera.aspect=window.innerWidth/window.innerHeight;
+camera.updateProjectionMatrix();
+});
+
+/* Filters */
+function filterItems(category,btn){
+document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+
+document.querySelectorAll('.card').forEach(card=>{
+card.style.display=(category==="all"||card.classList.contains(category))?"block":"none";
+});
+}
+
+/* Expand */
+function toggleDetails(card){
+let d=card.querySelector('.details');
+d.style.display=d.style.display==="block"?"none":"block";
+}
+
+/* Search */
+document.getElementById("search").addEventListener("input",function(){
+let val=this.value.toLowerCase();
+document.querySelectorAll(".card").forEach(card=>{
+card.style.display=card.dataset.name.toLowerCase().includes(val)?"block":"none";
+});
+});
+
+/* Sort */
+document.getElementById("sort").addEventListener("change",function(){
+let grid=document.querySelector(".grid");
+let cards=Array.from(document.querySelectorAll(".card"));
+
+if(this.value==="low") cards.sort((a,b)=>a.dataset.price-b.dataset.price);
+if(this.value==="high") cards.sort((a,b)=>b.dataset.price-a.dataset.price);
+if(this.value==="name") cards.sort((a,b)=>a.dataset.name.localeCompare(b.dataset.name));
+
+cards.forEach(c=>grid.appendChild(c));
+});
+</script>
+
+</body>
+</html>
